@@ -50,7 +50,7 @@ estimator = LagLlamaEstimator(
     rope_scaling=None,
     batch_size=batch_size,
     num_parallel_samples=100,
-    trainer_kwargs = {"max_epochs": 1},
+    trainer_kwargs = {"max_epochs": 50},
     device=device,
     lr=5e-4
 )
