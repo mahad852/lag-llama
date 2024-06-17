@@ -13,6 +13,8 @@ from gluonts.dataset.repository.datasets import get_dataset
 from gluonts.dataset.pandas import PandasDataset
 import pandas as pd
 
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+
 context_len = 512
 pred_len = 64
 ecg_dataset = ECG_MIT(context_len=context_len, pred_len=pred_len, data_path="/home/mali2/datasets/ecg/MIT-BIH.npz")
@@ -47,9 +49,7 @@ estimator = LagLlamaEstimator(
     rope_scaling=None,
     batch_size=batch_size,
     num_parallel_samples=100,
-    trainer_kwargs = {"max_epochs": 50},
     device=device,
-    lr=5e-4
 )
 
 lightning_module = estimator.create_lightning_module()
@@ -106,15 +106,39 @@ forecasts, tss = get_lag_llama_predictions(dataset, predictor, num_samples)
 
 print(len(forecasts), len(tss))
 
+mse_by_plen = {plen : 0 for plen in range(1, pred_len + 1)}
+rmse_by_plen = {plen : 0 for plen in range(1, pred_len + 1)}
+mae_by_plen = {plen : 0 for plen in range(1, pred_len + 1)}
+
+total = 0
+
 for i, (forecast, ts) in enumerate(zip(forecasts, tss)):
+    total += 1
+
     median_forecast = np.quantile(forecast.samples, 0.5, axis=0)
     gt = ts.iloc[:, 0].values[-pred_len:]
     print(f"Iteration: {i} | foreacast: {median_forecast.shape}, ts: {gt.shape}")
 
-# evaluator = Evaluator()
-# agg_metrics, ts_metrics = evaluator(iter(tss), iter(forecasts))
-# print(agg_metrics)
+    for plen in range(1, pred_len + 1):
+        mae_by_plen[plen] = mean_absolute_error(gt[:plen], median_forecast[:plen])
+        mse_by_plen[plen] = mean_squared_error(gt[:plen], median_forecast[:plen])
+
+for plen in range(1, pred_len + 1):
+    mse_by_plen[plen] /= total
+    rmse_by_plen[plen] = np.sqrt(rmse_by_plen)
+    mae_by_plen[plen] /= total
+
+evaluator = Evaluator()
+agg_metrics, ts_metrics = evaluator(iter(tss), iter(forecasts))
+print(agg_metrics)
 
 if not os.path.exists("logs"):
     os.mkdir("logs")
+
+with open(os.path.join("logs", f"LagLlama_V1_{context_len}_{pred_len}.csv"), "w") as f:
+    f.write("context_len,horizon_len,MSE,RMSE,MAE\n")
+    for p_len in range(1, pred_len + 1):
+        f.write(f"{context_len},{p_len},{mse_by_plen[p_len]},{rmse_by_plen[p_len]},{mae_by_plen[p_len]}")
+        if p_len != pred_len:
+            f.write("\n")
 
