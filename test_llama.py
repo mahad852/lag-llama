@@ -107,7 +107,7 @@ forecasts, tss = get_lag_llama_predictions(dataset, predictor, num_samples)
 print(len(forecasts), len(tss))
 
 for i, (forecast, ts) in enumerate(zip(forecasts, tss)):
-    print(f"Iteration: {i} | foreacast: {forecast.samples}, ts: {ts.iloc[:, 0].values}")
+    print(f"Iteration: {i} | foreacast: {forecast.samples.shape}, ts: {ts.iloc[:, 0].values.shape}")
 
 # evaluator = Evaluator()
 # agg_metrics, ts_metrics = evaluator(iter(tss), iter(forecasts))
