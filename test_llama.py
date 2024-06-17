@@ -17,13 +17,10 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 context_len = 512
 pred_len = 64
-ecg_dataset = ECG_MIT(context_len=context_len, pred_len=pred_len, data_path="/home/mali2/datasets/ecg/MIT-BIH.npz")
 
 batch_size = 16
-total_samples = 5000
 
-
-indices = random.sample(range(len(ecg_dataset)), total_samples)
+data_path = "/home/mali2/datasets/ecg/MIT-BIH-splits.npz"
 
 device = torch.device("cuda")
 
@@ -72,13 +69,15 @@ def get_lag_llama_predictions(dataset, predictor, num_samples=100):
 
 total_times = []
 
-def build_timeseries(dataset: ECG_MIT, indices: list[int]):
+def build_timeseries(dataset):
     targets = None
 
     item_ids = []
 
-    for index in indices:
-        x, y = dataset[index]
+    for i in range(1, len(dataset.files), 2):
+        xy = dataset[dataset.files[i]]
+        x, y = xy[:context_len], xy[context_len:context_len + pred_len]
+
         vals = np.append(x, y)
 
         if targets is None:
@@ -86,7 +85,7 @@ def build_timeseries(dataset: ECG_MIT, indices: list[int]):
         else:
             targets = np.append(targets, vals)
 
-        item_ids.extend([str(index)] * (x.shape[0] + y.shape[0]))
+        item_ids.extend([str(i)] * (x.shape[0] + y.shape[0]))
 
     df = pd.DataFrame(data={"item_id" : item_ids, "target" : targets})
     df["item_id"] = df["item_id"].astype("string")
@@ -95,9 +94,8 @@ def build_timeseries(dataset: ECG_MIT, indices: list[int]):
 
     dataset = PandasDataset.from_long_dataframe(df, target="target", item_id="item_id")
     return dataset
-    
 
-dataset = build_timeseries(ecg_dataset, indices)
+dataset = build_timeseries(np.load(data_path))
 
 backtest_dataset = dataset
 num_samples = 20 # number of samples sampled from the probability distribution for each timestep
