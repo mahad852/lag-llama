@@ -105,8 +105,13 @@ num_samples = 20 # number of samples sampled from the probability distribution f
 forecasts, tss = get_lag_llama_predictions(dataset, predictor, num_samples)
 
 print(len(forecasts), len(tss))
-print(forecasts[0].shape, tss[0].shape)
 
+for i, (forecast, ts) in enumerate(zip(forecasts, tss)):
+    print(f"Iteration: {i} | foreacast: {forecast.median()}, ts: {ts}")
+
+# evaluator = Evaluator()
+# agg_metrics, ts_metrics = evaluator(iter(tss), iter(forecasts))
+# print(agg_metrics)
 
 if not os.path.exists("logs"):
     os.mkdir("logs")
