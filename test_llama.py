@@ -27,7 +27,7 @@ indices = random.sample(range(len(ecg_dataset)), total_samples)
 
 device = torch.device("cuda")
 
-ckpt = torch.load("lightning_logs/version_1/checkpoints/epoch=46-step=2350.ckpt", map_location=device) # Uses GPU since in this Colab we use a GPU.
+ckpt = torch.load("lightning_logs/version_1/checkpoints/epoch=46-step=2350.ckpt", map_location="cpu") # Uses GPU since in this Colab we use a GPU.
 estimator_args = ckpt["hyper_parameters"]["model_kwargs"]
 
 rope_scaling_arguments = {
