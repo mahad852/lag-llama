@@ -106,7 +106,7 @@ backtest_dataset = dataset
 num_samples = 20 # number of samples sampled from the probability distribution for each timestep
 
 
-predictor = estimator.train(dataset, cache_data=True, shuffle_buffer_length=1000, ckpt_path="lagllama_weights/finetuned.cpkt")
+predictor = estimator.train(dataset, cache_data=True, shuffle_buffer_length=1000)
 
 # get_lag_llama_predictions(dataset, predictor, num_samples)
 
