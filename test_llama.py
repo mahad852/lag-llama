@@ -128,9 +128,10 @@ for plen in range(1, pred_len + 1):
     rmse_by_plen[plen] = np.sqrt(mse_by_plen[plen])
     mae_by_plen[plen] /= total
 
-evaluator = Evaluator()
-agg_metrics, ts_metrics = evaluator(iter(tss), iter(forecasts))
-print(agg_metrics)
+print(f"Finished inference. MSE: {mse_by_plen[pred_len]} RMSE: {rmse_by_plen[pred_len]} MAE: {mae_by_plen[pred_len]}")
+# evaluator = Evaluator()
+# agg_metrics, ts_metrics = evaluator(iter(tss), iter(forecasts))
+# print(agg_metrics)
 
 if not os.path.exists("logs"):
     os.mkdir("logs")
