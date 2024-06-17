@@ -120,8 +120,8 @@ for i, (forecast, ts) in enumerate(zip(forecasts, tss)):
     print(f"Iteration: {i} | foreacast: {median_forecast.shape}, ts: {gt.shape}")
 
     for plen in range(1, pred_len + 1):
-        mae_by_plen[plen] = mean_absolute_error(gt[:plen], median_forecast[:plen])
-        mse_by_plen[plen] = mean_squared_error(gt[:plen], median_forecast[:plen])
+        mae_by_plen[plen] += mean_absolute_error(gt[:plen], median_forecast[:plen])
+        mse_by_plen[plen] += mean_squared_error(gt[:plen], median_forecast[:plen])
 
 for plen in range(1, pred_len + 1):
     mse_by_plen[plen] /= total
