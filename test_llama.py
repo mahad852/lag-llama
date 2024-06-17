@@ -125,7 +125,7 @@ for i, (forecast, ts) in enumerate(zip(forecasts, tss)):
 
 for plen in range(1, pred_len + 1):
     mse_by_plen[plen] /= total
-    rmse_by_plen[plen] = np.sqrt(rmse_by_plen)
+    rmse_by_plen[plen] = np.sqrt(mse_by_plen[plen])
     mae_by_plen[plen] /= total
 
 evaluator = Evaluator()
