@@ -88,7 +88,7 @@ def build_timeseries(dataset: ECG_MIT, indices: list[int]):
     df = pd.DataFrame(data={"item_id" : item_ids, "target" : targets})
     df["item_id"] = df["item_id"].astype("string")
     df["target"] = df["target"].astype("float32")
-    df = df.set_index(pd.date_range('1990', freq='3ms', periods=df.shape[0]))
+    df.set_index(pd.date_range('1990', freq='3ms', periods=df.shape[0]), inplace=True)
 
     dataset = PandasDataset.from_long_dataframe(df, target="target", item_id="item_id")
     return dataset
