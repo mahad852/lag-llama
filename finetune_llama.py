@@ -50,9 +50,10 @@ estimator = LagLlamaEstimator(
     rope_scaling=None,
     batch_size=batch_size,
     num_parallel_samples=100,
-    trainer_kwargs = {"max_epochs": 50},
+    trainer_kwargs = {"max_epochs": 1},
     device=device,
-    lr=5e-4
+    lr=5e-4,
+    num_batches_per_epoch=int(total_samples/batch_size)
 )
 
 lightning_module = estimator.create_lightning_module()
