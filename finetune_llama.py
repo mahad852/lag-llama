@@ -21,7 +21,7 @@ pred_len = 64
 ecg_dataset = ECG_MIT(context_len=context_len, pred_len=pred_len, data_path="/home/mali2/datasets/ecg/MIT-BIH.npz")
 
 batch_size = 64
-total_samples = 100000
+total_samples = 1000000
 
 
 indices = random.sample(range(len(ecg_dataset)), total_samples)
@@ -50,9 +50,9 @@ estimator = LagLlamaEstimator(
     rope_scaling=None,
     batch_size=batch_size,
     num_parallel_samples=100,
-    trainer_kwargs = {"max_epochs": 1},
+    trainer_kwargs = {"max_epochs": 20},
     device=device,
-    lr=5e-4,
+    lr=5e-5,
     num_batches_per_epoch=int(total_samples/batch_size)
 )
 
