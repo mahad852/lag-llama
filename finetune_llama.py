@@ -21,7 +21,7 @@ pred_len = 64
 ecg_dataset = ECG_MIT(context_len=context_len, pred_len=pred_len, data_path="/home/mali2/datasets/ecg/MIT-BIH.npz")
 
 batch_size = 64
-total_samples = 10000000
+total_samples = 1000000
 
 
 indices = random.sample(range(len(ecg_dataset)), total_samples)
@@ -76,19 +76,13 @@ def get_lag_llama_predictions(dataset, predictor, num_samples=100):
 total_times = []
 
 def build_timeseries(dataset: ECG_MIT, indices: list[int]):
-    targets = None
+    targets = np.zeros((context_len + pred_len) * total_samples)
 
     item_ids = []
 
-    for index in indices:
+    for i, index in enumerate(indices):
         x, y = dataset[index]
-        vals = np.append(x, y)
-
-        if targets is None:
-            targets = vals
-        else:
-            targets = np.append(targets, vals)
-
+        targets[i * (context_len + pred_len) : (i + 1) * (context_len + pred_len)] = np.append(x, y)
         item_ids.extend([str(index)] * (x.shape[0] + y.shape[0]))
 
     df = pd.DataFrame(data={"item_id" : item_ids, "target" : targets})
