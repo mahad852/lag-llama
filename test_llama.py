@@ -24,7 +24,8 @@ data_path = "/home/mali2/datasets/ecg/MIT-BIH-splits.npz"
 
 device = torch.device("cuda")
 
-ckpt = torch.load("lightning_logs/version_1/checkpoints/epoch=46-step=2350.ckpt", map_location="cpu") # Uses GPU since in this Colab we use a GPU.
+# ckpt = torch.load("lightning_logs/version_1/checkpoints/epoch=46-step=2350.ckpt", map_location="cpu") # Uses GPU since in this Colab we use a GPU.
+ckpt = torch.load("lightning_logs/version_3/checkpoints/epoch=0-step=1562.ckpt", map_location="cpu")
 estimator_args = ckpt["hyper_parameters"]["model_kwargs"]
 
 rope_scaling_arguments = {
@@ -33,7 +34,8 @@ rope_scaling_arguments = {
 }
 
 estimator = LagLlamaEstimator(
-    ckpt_path="lightning_logs/version_1/checkpoints/epoch=46-step=2350.ckpt",
+    # ckpt_path="lightning_logs/version_1/checkpoints/epoch=46-step=2350.ckpt",
+    ckpt_path="lightning_logs/version_3/checkpoints/epoch=0-step=1562.ckpt",
     prediction_length=pred_len,
     context_length=context_len, # Lag-Llama was trained with a context length of 32, but can work with any context length
 
@@ -135,7 +137,7 @@ print(f"Finished inference. MSE: {mse_by_plen[pred_len]} RMSE: {rmse_by_plen[pre
 if not os.path.exists("logs"):
     os.mkdir("logs")
 
-with open(os.path.join("logs", f"LagLlama_V1_{context_len}_{pred_len}.csv"), "w") as f:
+with open(os.path.join("logs", f"LagLlama_V3_{context_len}_{pred_len}.csv"), "w") as f:
     f.write("context_len,horizon_len,MSE,RMSE,MAE\n")
     for p_len in range(1, pred_len + 1):
         f.write(f"{context_len},{p_len},{mse_by_plen[p_len]},{rmse_by_plen[p_len]},{mae_by_plen[p_len]}")
